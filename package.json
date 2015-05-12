@@ -1,36 +1,33 @@
 {
-  "name": "MyoMedia",
-  "version": "0.1.0",
+  "name": "myomedia",
+  "productName": "MyoMedia",
+  "version": "0.0.0",
   "description": "Natural interface for your home media centre",
+  "license": "MIT",
   "main": "src/index.js",
-  "dependencies": {
-    "parse-torrent-name": "^0.5.4"
+  "repository": "Glavin001/myomedia",
+  "author": {
+    "name": "Glavin Wiechert",
+    "email": "glavin.wiechert@gmail.com",
+    "url": "github.com/Glavin001/MyoMedia"
   },
-  "devDependencies": {
-    "babel": "^5.2.17"
+  "engines": {
+    "node": ">=0.10.0"
   },
   "scripts": {
-    "prepublish": "npm run-script prestart",
-    "prestart": "./node_modules/.bin/babel src/ --out-dir build --source-maps inline",
-    "start": "node src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "build": "electron-packager . $npm_package_productName --prune --asar --ignore=node_modules/electron-prebuilt --ignore=node_modules/electron-packager --ignore=.git --out=dist"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Glavin001/MyoMedia.git"
-  },
-  "keywords": [
-    "myo",
-    "wit.ai",
-    "speech",
-    "recognition",
-    "media",
-    "centre"
+  "files": [
+    "index.js",
+    "index.html",
+    "index.css"
   ],
-  "author": "Glavin Wiechert",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Glavin001/MyoMedia/issues"
-  },
-  "homepage": "https://github.com/Glavin001/MyoMedia"
+  "keywords": [
+    "electron-app"
+  ],
+  "devDependencies": {
+    "electron-packager": "^3.3.0",
+    "electron-prebuilt": "^0.25.2"
+  }
 }
