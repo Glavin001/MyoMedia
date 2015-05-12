@@ -1,0 +1,36 @@
+{
+  "name": "MyoMedia",
+  "version": "0.1.0",
+  "description": "Natural interface for your home media centre",
+  "main": "src/index.js",
+  "dependencies": {
+    "parse-torrent-name": "^0.5.4"
+  },
+  "devDependencies": {
+    "babel": "^5.2.17"
+  },
+  "scripts": {
+    "prepublish": "npm run-script prestart",
+    "prestart": "./node_modules/.bin/babel src/ --out-dir build --source-maps inline",
+    "start": "node src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Glavin001/MyoMedia.git"
+  },
+  "keywords": [
+    "myo",
+    "wit.ai",
+    "speech",
+    "recognition",
+    "media",
+    "centre"
+  ],
+  "author": "Glavin Wiechert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Glavin001/MyoMedia/issues"
+  },
+  "homepage": "https://github.com/Glavin001/MyoMedia"
+}
