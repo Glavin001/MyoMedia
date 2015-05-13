@@ -33,7 +33,10 @@
   },
   "dependencies": {
     "babel-core": "^5.3.1",
+    "lodash": "^3.8.0",
     "myo": "^1.5.0",
-    "node-wit": "git+https://github.com/Glavin001/node-wit.git"
+    "node-wit": "git+https://github.com/Glavin001/node-wit.git",
+    "parse-torrent-name": "^0.5.4",
+    "walk": "^2.3.9"
   }
 }

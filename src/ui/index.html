@@ -14,15 +14,77 @@
         <header>
             <h1>MyoMedia</h1>
         </header>
-        <section class="main"></section>
-        <button class="btn btn-lg btn-primary listen-btn">
-            <i class="fa fa-microphone"></i> Listen
-        </button>
-        <section class="intent"></section>
-        <section class="pose"></section>
-        <pre class="gyroscope"></pre>
-        <pre class="orientation"></pre>
-        <pre class="accelerometer"></pre>
+
+        <br/>
+
+        <div role="tabpanel">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+                <li role="presentation"><a href="#myo" aria-controls="myo" role="tab" data-toggle="tab">Myo</a></li>
+                <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+
+                <br/>
+                <section class="main"></section>
+                <br/>
+
+                <div role="tabpanel" class="tab-pane active" id="home">
+                    <button class="btn btn-lg btn-primary listen-btn">
+                        <i class="fa fa-microphone"></i> Listen
+                    </button>
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="myo">
+                    <section class="intent"></section>
+                    <section class="pose"></section>
+                    <pre class="gyroscope"></pre>
+                    <pre class="orientation"></pre>
+                    <pre class="accelerometer"></pre>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="settings">
+                    <div class="form-horizontal">
+                        <div class="form-group has-error has-feedback">
+                            <label class="control-label col-sm-2" for="mediaPath">Media Folder</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control media-path" id="mediaPath" aria-describedby="mediaPathStatus" placeholder="No media folder selected">
+                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                                <span id="mediaPathStatus" class="sr-only">(success)</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button class="btn btn-info choose-media-btn">
+                                    <i class="fa fa-film"></i> Choose Media Folder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br/>
+
+                    <div class="progress media-indexing-progress">
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" style="width: 0%">
+                            <span class="sr-only">0% Complete (success)</span>
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 0%">
+                            <span class="sr-only">0% Complete (warning)</span>
+                        </div>
+                        <div class="progress-bar progress-bar-danger progress-bar-striped active" style="width: 0%">
+                            <span class="sr-only">0% Complete (danger)</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
         <footer></footer>
     </div>
     <script>

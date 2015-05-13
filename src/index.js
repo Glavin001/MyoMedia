@@ -7,6 +7,10 @@ const ipc = require('ipc');
 const fs = require('fs');
 const path = require('path');
 const wit = require('node-wit');
+const walk = require('walk');
+const dialog = require('dialog');
+const _ = require('lodash');
+const ptn = require('parse-torrent-name');
 
 // Configure
 const WIT_ACCESS_TOKEN = "FRH5QS2T4EW5ANB3N44YUXGZLUQUCSO5";
@@ -18,9 +22,9 @@ require('crash-reporter').start();
 let mainWindow = null;
 
 app.on('window-all-closed', function() {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    // if (process.platform !== 'darwin') {
+    app.quit();
+    // }
 });
 
 app.on('ready', function() {
@@ -95,7 +99,7 @@ ipc.on('speech-recognition:start', function(event, arg) {
     recordingTimeout = setTimeout(function() {
         event.sender.send('speech-recognition:stop');
     }, 10000);
-    
+
     event.sender.send('speech-recognition:start');
 
 });
@@ -112,4 +116,97 @@ ipc.on('speech-recognition:stop', function(event, arg) {
 
     event.sender.send('speech-recognition:stop');
 
+});
+
+let supportedExtensions = ['.mp4'];
+
+ipc.on('select-media-directory', function(event, arg) {
+    dialog.showOpenDialog({
+        properties: ['openDirectory']
+    }, function(filePaths) {
+
+        console.log(`Path: ${filePaths}`);
+        if (filePaths) {
+            var filePath = filePaths[0];
+            event.sender.send('selected-media-directory',
+                filePath);
+
+            var options = {};
+            var walker = walk.walk(filePath, options);
+            walker.on("file", function(root, fileStats, next) {
+                event.sender.send('found-media-file',
+                    fileStats.name);
+                process.nextTick(function() {
+                    // Check file extension
+                    let ext = path.extname(
+                        fileStats.name);
+                    if (_.contains(
+                            supportedExtensions,
+                            ext)) {
+                        // Process this file
+                        let name = path.basename(
+                            fileStats.name,
+                            ext);
+                        let parsedName = ptn(
+                            name);
+                        // console.log(root, name);
+                        // Verify that the parent directory
+                        let parentDirs = root.split(
+                            path.sep)
+                        let parentDirName =
+                            parentDirs[
+                                parentDirs.length -
+                                1];
+                        // console.log(parentDirs,parentDirName);
+
+                        // Exclude Samples
+                        if (parentDirName.toLowerCase() ===
+                            "sample") {
+                            // This file should be ignored and
+                            // will not be processed any further
+                            event.sender.send(
+                                'process-media-file',
+                                false);
+                            console.log('Sample detected!', root, name);
+                            return;
+                        }
+
+                        let parsedDirName = ptn(
+                            parentDirName);
+                        // console.log('Both parsed', parsedName, parsedDirName);
+
+                        let parsed;
+                        if (!parsedName.episode &&
+                            parsedDirName.episode
+                        ) {
+                            parsed =
+                                parsedDirName;
+                        } else {
+                            parsed = parsedName;
+                        }
+                        console.log('Final parsed', parsed);
+                        event.sender.send(
+                            'process-media-file',
+                            parsed);
+
+                    } else {
+                        // This file is not supported and
+                        // will not be processed any further
+                        event.sender.send(
+                            'process-media-file',
+                            false);
+                    }
+                });
+                next();
+            });
+            walker.on("errors", function(root, nodeStatsArray,
+                next) {
+                next();
+            });
+            walker.on("end", function() {
+                console.log("all done");
+            });
+        }
+
+    });
 });
