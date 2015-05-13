@@ -6,6 +6,7 @@
     <title>MyoMedia</title>
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -14,6 +15,10 @@
             <h1>MyoMedia</h1>
         </header>
         <section class="main"></section>
+        <button class="btn btn-lg btn-primary listen-btn">
+            <i class="fa fa-microphone"></i> Listen
+        </button>
+        <section class="intent"></section>
         <section class="pose"></section>
         <pre class="gyroscope"></pre>
         <pre class="orientation"></pre>
@@ -24,7 +29,8 @@
         window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.js');
     </script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="index.js"></script>
+    <script src="../../node_modules/babel-core/browser.min.js"></script>
+    <script src="index.js" type="text/babel"></script>
 </body>
 
 </html>
