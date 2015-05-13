@@ -136,7 +136,7 @@ $(document).ready(function() {
         mediaIndexProgress.total++;
         refreshMediaProgress();
     });
-    ipc.on('process-media-file', function(filePath) {
+    ipc.on('processed-media-file', function(filePath) {
         if (filePath instanceof Error) {
             mediaIndexProgress.errors++;
         } else {
