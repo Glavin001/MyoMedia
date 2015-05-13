@@ -137,7 +137,11 @@ $(document).ready(function() {
         refreshMediaProgress();
     });
     ipc.on('process-media-file', function(filePath) {
-        mediaIndexProgress.success++;
+        if (filePath instanceof Error) {
+            mediaIndexProgress.errors++;
+        } else {
+            mediaIndexProgress.success++;
+        }
         refreshMediaProgress();
     });
 });

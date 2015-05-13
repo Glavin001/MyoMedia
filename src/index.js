@@ -11,9 +11,56 @@ const walk = require('walk');
 const dialog = require('dialog');
 const _ = require('lodash');
 const ptn = require('parse-torrent-name');
+const Datastore = require('nedb');
+const MovieDB = require('moviedb');
+const TVDB = require("node-tvdb");
 
 // Configure
 const WIT_ACCESS_TOKEN = "FRH5QS2T4EW5ANB3N44YUXGZLUQUCSO5";
+const MOVIEDB_API_KEY = process.env.MOVIEDB_API_KEY;
+const TVDB_API_KEY = process.env.TVDB_API_KEY;
+
+// The Movie Database
+let mdb = MovieDB(MOVIEDB_API_KEY);
+
+// The TV Database
+let tvdb = new TVDB(TVDB_API_KEY);
+
+// Local database
+function getUserHome() {
+    return process.env[(process.platform == 'win32') ? 'USERPROFILE' :
+        'HOME'];
+}
+let databasePath = path.resolve(getUserHome(), './.myomedia/database/');
+let moviesCollectionPath = path.resolve(databasePath, './movies.db');
+let showsCollectionPath = path.resolve(databasePath, './shows.db');
+var db = {
+    'movies': new Datastore({
+        filename: moviesCollectionPath,
+        autoload: true
+    }),
+    'shows': new Datastore({
+        filename: showsCollectionPath,
+        autoload: true
+    })
+};
+// Database Indexing
+db.movies.ensureIndex({
+    fieldName: 'title',
+    unique: true
+}, function(err) {
+    if (err) {
+        console.log(err);
+    }
+});
+db.shows.ensureIndex({
+    fieldName: 'title',
+    unique: true
+}, function(err) {
+    if (err) {
+        console.log(err);
+    }
+});
 
 // report crashes to the Electron project
 require('crash-reporter').start();
@@ -78,7 +125,6 @@ ipc.on('speech-recognition:start', function(event, arg) {
         event.sender.send('speech-recognition:result', res);
     };
 
-
     // Wit.ai Speech Recognition & Intent
     // The `captureSpeechIntent` function returns the `node-record-lpcm16` object
     // See https://github.com/gillesdemey/node-record-lpcm16 for more details
@@ -118,7 +164,7 @@ ipc.on('speech-recognition:stop', function(event, arg) {
 
 });
 
-let supportedExtensions = ['.mp4'];
+let supportedExtensions = ['.mp4', '.avi'];
 
 ipc.on('select-media-directory', function(event, arg) {
     dialog.showOpenDialog({
@@ -167,7 +213,9 @@ ipc.on('select-media-directory', function(event, arg) {
                             event.sender.send(
                                 'process-media-file',
                                 false);
-                            console.log('Sample detected!', root, name);
+                            console.log(
+                                'Sample detected!',
+                                root, name);
                             return;
                         }
 
@@ -184,10 +232,54 @@ ipc.on('select-media-directory', function(event, arg) {
                         } else {
                             parsed = parsedName;
                         }
-                        console.log('Final parsed', parsed);
-                        event.sender.send(
-                            'process-media-file',
-                            parsed);
+                        // console.log(
+                        //     'Final parsed',
+                        //     parsed);
+
+                        // Store in database
+                        // Check if movie or TV show
+                        if (parsed.episode) {
+                            // Show
+                            let doc = {
+                                title: `${parsed.title} - Season ${parsed.season} Episode ${parsed.episode}`,
+                                series: parsed.title,
+                                season: parsed.season,
+                                epsiode: parsed.episode,
+                                meta: parsed
+                            };
+                            db.shows.insert(doc, function(err) {
+                                if (err) {
+                                    console.error(err)
+                                    event.sender.send(
+                                        'process-media-file',
+                                        err);
+                                    return;
+                                }
+                                event.sender.send(
+                                    'process-media-file',
+                                    doc);
+                            });
+                        } else {
+                            // Movie (default)
+                            let doc = {
+                                title: `${parsed.title} (${parsed.year})`,
+                                name: parsed.title,
+                                year: parsed.year,
+                                meta: parsed
+                            };
+                            db.movies.insert(doc, function(err) {
+                                if (err) {
+                                    console.error(err)
+                                    event.sender.send(
+                                        'process-media-file',
+                                        err);
+                                    return;
+                                }
+                                event.sender.send(
+                                    'process-media-file',
+                                    doc);
+                            });
+                        }
 
                     } else {
                         // This file is not supported and
@@ -197,6 +289,7 @@ ipc.on('select-media-directory', function(event, arg) {
                             false);
                     }
                 });
+
                 next();
             });
             walker.on("errors", function(root, nodeStatsArray,
