@@ -1,0 +1,21 @@
+{
+  "name": "MyoMedia",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Glavin001/MyoMedia",
+  "authors": [
+    "Glavin Wiechert <glavin.wiechert@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/ui/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4"
+  }
+}
