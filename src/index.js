@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const wit = require('node-wit');
 
+// Configure
 const WIT_ACCESS_TOKEN = "FRH5QS2T4EW5ANB3N44YUXGZLUQUCSO5";
 
 // report crashes to the Electron project
@@ -50,28 +51,27 @@ app.on('ready', function() {
 
 // Declare recording in this scope
 var recording;
+var recordingTimeout;
 
 ipc.on('speech-recognition:start', function(event, arg) {
-    console.log('speech-recognition:start');
+    // console.log('speech-recognition:start');
     if (recording) {
         console.warn(
             "Recording in progress. Stop previous recording first before starting another."
         );
+        return;
     }
 
-    var callback = function(err,
-        res) {
-        console.log('captureSpeechIntentFromMic', err,
-            res);
+    var callback = function(err, res) {
+        console.log('captureSpeechIntentFromMic', err, res);
+
         // console.log(
         //     "Response from Wit for microphone audio stream: "
         // );
         if (err) {
             event.sender.send('speech-recognition:error', err);
-            // $intent.html("Error: ", err);
         }
         event.sender.send('speech-recognition:result', res);
-        // $intent.html(JSON.stringify(res, null, " "));
     };
 
 
@@ -90,15 +90,23 @@ ipc.on('speech-recognition:start', function(event, arg) {
     // wit.captureSpeechIntent(WIT_ACCESS_TOKEN, stream, "audio/wav",
     //     callback);
 
-    event.sender.send('speech-recognition:start');
+    // Wit.ai has 10 seconds max speech recording duration
+    clearTimeout(recordingTimeout);
+    recordingTimeout = setTimeout(function() {
+        event.sender.send('speech-recognition:stop');
+    }, 10000);
     
+    event.sender.send('speech-recognition:start');
+
 });
 
 ipc.on('speech-recognition:stop', function(event, arg) {
-    console.log('speech-recognition:stop');
+    // console.log('speech-recognition:stop');
     if (recording && typeof recording.stop === "function") {
         // Stop recording
         recording.stop();
+        clearTimeout(recordingTimeout);
+        recordingTimeout = null;
     }
     recording = null;
 

@@ -65,7 +65,7 @@ $(document).ready(function() {
         myMyo.vibrate();
     });
     ipc.on('speech-recognition:stop', function() {
-        $intent.html('Processing speeching...');
+        // $intent.html('Processing speeching...');
         myMyo.vibrate();
     });
 
